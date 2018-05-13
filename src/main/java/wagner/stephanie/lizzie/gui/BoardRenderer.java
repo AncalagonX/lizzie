@@ -416,7 +416,7 @@ public class BoardRenderer {
 
                     boolean isBestMove = bestMoves.get(0) == move;
 
-                    if (move.playouts == 0) // this actually can happen
+                    if (move.playouts < 10) // this actually can happen
                         continue;
 
                     double percentPlayouts = (double) move.playouts / maxPlayouts;

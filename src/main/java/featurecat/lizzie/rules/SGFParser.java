@@ -164,11 +164,7 @@ public class SGFParser {
                     } else if (tag.equals("PW")) {
                         whitePlayer = tagContent;
                     }  else if (tag.equals("KM")) {
-                        try {
-                            Lizzie.board.getHistory().getGameInfo().setKomi(Double.parseDouble(tagContent));
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
+                        Lizzie.board.getHistory().getGameInfo().setKomi(Double.parseDouble(tagContent));
                     }
                     break;
                 case ';':

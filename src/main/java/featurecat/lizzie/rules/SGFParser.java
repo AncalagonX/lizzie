@@ -165,9 +165,6 @@ public class SGFParser {
                         whitePlayer = tagContent;
                     }  else if (tag.equals("KM")) {
                         try {
-                            if (tagContent.trim().isEmpty()) {
-                                tagContent = "0.0";
-                            }
                             Lizzie.board.getHistory().getGameInfo().setKomi(Double.parseDouble(tagContent));
                         } catch (NumberFormatException e) {
                             e.printStackTrace();

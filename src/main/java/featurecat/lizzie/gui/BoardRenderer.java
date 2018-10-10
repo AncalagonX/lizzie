@@ -503,8 +503,8 @@ public class BoardRenderer {
             return;
 
         final int MIN_ALPHA = 32;
-        final double HUE_SCALING_FACTOR = 3.0;
-        final double ALPHA_SCALING_FACTOR = 5.0;
+        final double HUE_SCALING_FACTOR = 0.9;
+        final double ALPHA_SCALING_FACTOR = 3.0;
         final float GREEN_HUE = Color.RGBtoHSB(0, 1, 0, null)[0];
         final float CYAN_HUE = Color.RGBtoHSB(0, 1, 1, null)[0];
 
@@ -546,6 +546,7 @@ public class BoardRenderer {
                         continue;
 
                     double percentPlayouts = (double) move.playouts / maxPlayouts;
+					double percentWinrate = (double) move.winrate / maxWinrate;
 
                     int[] coordinates = Board.convertNameToCoordinates(move.coordinate);
                     int suggestionX = x + scaledMargin + squareLength * coordinates[0];
@@ -553,10 +554,10 @@ public class BoardRenderer {
 
 
                     // 0 = Reddest hue
-                    float hue = isBestMove ? CYAN_HUE : (float) (-GREEN_HUE * Math.max(0, Math.log(percentPlayouts) / HUE_SCALING_FACTOR + 1));
+                    float hue = isBestMove ? CYAN_HUE : (float) (-GREEN_HUE * Math.max(0, Math.log(percentWinrate) / HUE_SCALING_FACTOR + 1));
                     float saturation = 0.75f; //saturation
                     float brightness = 0.85f; //brightness
-                    int alpha = (int) (MIN_ALPHA + (maxAlpha - MIN_ALPHA) * Math.max(0, Math.log(percentPlayouts) /
+                    int alpha = (int) (MIN_ALPHA + (maxAlpha - MIN_ALPHA) * Math.max(0, Math.log(percentWinrate) /
                             ALPHA_SCALING_FACTOR + 1));
 //                    if (uiConfig.getBoolean("shadows-enabled"))
 //                        alpha = 255;

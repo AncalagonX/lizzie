@@ -563,6 +563,14 @@ public class BoardRenderer {
     float greenHue = Color.RGBtoHSB(0, 255, 0, null)[0];
     float cyanHue = Color.RGBtoHSB(0, 255, 255, null)[0];
 
+    ////////////////////////////////////////////
+	////// MY ORIGINAL VALUES BELOW:
+	//final int MIN_ALPHA = 32;
+    //final double HUE_SCALING_FACTOR = 0.9;
+    //final double ALPHA_SCALING_FACTOR = 3.0;
+    //final float GREEN_HUE = Color.RGBtoHSB(0, 1, 0, null)[0];
+    //final float CYAN_HUE = Color.RGBtoHSB(0, 1, 1, null)[0];
+
     if (bestMoves != null && !bestMoves.isEmpty()) {
 
       int maxPlayouts = 0;
@@ -641,6 +649,18 @@ public class BoardRenderer {
 
             hue = redHue + (greenHue - redHue) * (float) fraction;
           }
+
+/**************************************************
+// MY ORIGINAL CODE AND VALUES ARE HERE:
+                    // 0 = Reddest hue
+                    float hue = isBestMove ? CYAN_HUE : (float) (-GREEN_HUE * Math.max(0, Math.log(percentWinrate) / HUE_SCALING_FACTOR + 1));
+                    float saturation = 0.75f; //saturation
+                    float brightness = 0.85f; //brightness
+                    int alpha = (int) (MIN_ALPHA + (maxAlpha - MIN_ALPHA) * Math.max(0, Math.log(percentWinrate) /
+                            ALPHA_SCALING_FACTOR + 1));
+//                    if (uiConfig.getBoolean("shadows-enabled"))
+//                        alpha = 255;
+**************************************************/
 
           float saturation = 1.0f;
           float brightness = 0.85f;

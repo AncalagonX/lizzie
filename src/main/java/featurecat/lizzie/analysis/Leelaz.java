@@ -408,15 +408,13 @@ public class Leelaz {
 	public void narrow_search() {
 		String command = "narrow_search";
 		sendCommand(command);
-		if (isPondering)
-                ponder();
+		ponder();
 	}
 
 	public void widen_search() {
 		String command = "widen_search";
 		sendCommand(command);
-		if (isPondering)
-                ponder();
+		ponder();
 	}
 
     public void undo() {

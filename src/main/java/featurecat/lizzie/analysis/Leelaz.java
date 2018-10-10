@@ -506,6 +506,54 @@ public class Leelaz {
     }
   }
 
+  /****************************************************************
+  ///////////// OLD ORIGINAL CODE FROM MY OLD VERSION:
+
+    public void genmove(String color) {
+        String command = "genmove " + color;
+        //
+        // We don't support displaying this while playing, so no reason to request it (for now)
+        //if (isPondering) {
+        //    command = "lz-genmove_analyze " + color + " 10";
+        //}
+        sendCommand(command);
+        isThinking = true;
+        isPondering = false;
+    }
+
+	****************************************************************/
+
+	
+	public void narrow_search() {
+		String command = "narrow_search";
+		sendCommand(command);
+		if (isPondering)
+                ponder();
+	}
+
+	public void widen_search() {
+		String command = "widen_search";
+		sendCommand(command);
+		if (isPondering)
+                ponder();
+	}
+
+  /****************************************************************
+  ///////////// OLD ORIGINAL CODE FROM MY OLD VERSION:
+
+
+    public void undo() {
+        synchronized (this) {
+            sendCommand("undo");
+            bestMoves = new ArrayList<>();
+            if (isPondering)
+                ponder();
+        }
+    }
+
+	****************************************************************/
+
+
   /** This initializes leelaz's pondering mode at its current position */
   private void ponder() {
     isPondering = true;

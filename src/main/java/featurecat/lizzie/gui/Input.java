@@ -235,6 +235,18 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
                 Lizzie.board.pass();
                 break;
 
+			case VK_1:
+                Lizzie.leelaz.narrow_search();
+				if (Lizzie.leelaz.isPondering())
+                    Lizzie.leelaz.togglePonder();
+                break;
+
+			case VK_2:
+                Lizzie.leelaz.widen_search();
+				if (Lizzie.leelaz.isPondering())
+                    Lizzie.leelaz.togglePonder();
+                break;
+
             case VK_COMMA:
                 if (!Lizzie.frame.playCurrentVariation())
                     Lizzie.frame.playBestMove();

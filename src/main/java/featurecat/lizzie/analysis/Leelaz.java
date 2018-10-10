@@ -404,6 +404,20 @@ public class Leelaz {
         isThinking = true;
         isPondering = false;
     }
+	
+	public void narrow_search() {
+		String command = "narrow_search";
+		sendCommand(command);
+		if (isPondering)
+                ponder();
+	}
+
+	public void widen_search() {
+		String command = "widen_search";
+		sendCommand(command);
+		if (isPondering)
+                ponder();
+	}
 
     public void undo() {
         synchronized (this) {

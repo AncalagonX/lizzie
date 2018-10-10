@@ -358,8 +358,8 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
         // Use Ctrl+Num to switching multiple engine
       case VK_0:
-      case VK_1:
-      case VK_2:
+      // case VK_1:
+      // case VK_2:
       case VK_3:
       case VK_4:
       case VK_5:

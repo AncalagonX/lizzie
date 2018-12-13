@@ -66,6 +66,20 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
     if (!Lizzie.board.undoToChildOfPreviousWithVariation()) Lizzie.board.previousMove();
   }
 
+  private void undoToFirstParentWithVariations() {
+    if (Lizzie.board.undoToChildOfPreviousWithVariation()) {
+      Lizzie.board.previousMove();
+    }
+  }
+
+  private void goCommentNode(boolean moveForward) {
+    if (moveForward) {
+      redo(Lizzie.board.getHistory().getCurrentHistoryNode().goToNextNodeWithComment());
+    } else {
+      undo(Lizzie.board.getHistory().getCurrentHistoryNode().goToPreviousNodeWithComment());
+    }
+  }
+
   private void redo() {
     redo(1);
   }
@@ -157,13 +171,17 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_LEFT:
         if (e.isShiftDown()) {
           moveBranchUp();
+        } else if (controlIsPressed(e)) {
+          undoToFirstParentWithVariations();
         } else {
           previousBranch();
         }
         break;
 
       case VK_UP:
-        if (e.isShiftDown()) {
+        if (controlIsPressed(e) && e.isShiftDown()) {
+          goCommentNode(false);
+        } else if (e.isShiftDown()) {
           undoToChildOfPreviousWithVariation();
         } else if (controlIsPressed(e)) {
           undo(10);
@@ -181,7 +199,9 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_DOWN:
-        if (controlIsPressed(e)) {
+        if (controlIsPressed(e) && e.isShiftDown()) {
+          goCommentNode(true);
+        } else if (controlIsPressed(e)) {
           redo(10);
         } else {
           redo();
@@ -196,7 +216,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_SPACE:
         if (Lizzie.frame.isPlayingAgainstLeelaz) {
           Lizzie.frame.isPlayingAgainstLeelaz = false;
-          Lizzie.leelaz.togglePonder(); // we must toggle twice for it to restart pondering
           Lizzie.leelaz.isThinking = false;
         }
         Lizzie.leelaz.togglePonder();
@@ -269,7 +288,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_HOME:
-        while (Lizzie.board.previousMove()) ;
+        if (controlIsPressed(e)) {
+          Lizzie.board.clear();
+        } else {
+          while (Lizzie.board.previousMove()) ;
+        }
         break;
 
       case VK_END:
@@ -290,7 +313,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_W:
-        Lizzie.config.toggleShowWinrate();
+        if (controlIsPressed(e)) {
+          Lizzie.config.toggleLargeWinrate();
+        } else {
+          Lizzie.config.toggleShowWinrate();
+        }
         break;
 
       case VK_G:
@@ -298,14 +325,22 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_T:
-        Lizzie.config.toggleShowComment();
+        if (controlIsPressed(e)) {
+          Lizzie.config.toggleShowCommentNodeColor();
+        } else {
+          Lizzie.config.toggleShowComment();
+        }
+        break;
+
+      case VK_Y:
+        Lizzie.config.toggleNodeColorMode();
         break;
 
       case VK_C:
         if (controlIsPressed(e)) {
           Lizzie.frame.copySgf();
         } else {
-          Lizzie.frame.toggleCoordinates();
+          Lizzie.config.toggleCoordinates();
         }
         break;
 
@@ -347,13 +382,21 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_PERIOD:
-        if (Lizzie.board.getHistory().getNext() == null) {
+        if (!Lizzie.board.getHistory().getNext().isPresent()) {
           Lizzie.board.setScoreMode(!Lizzie.board.inScoreMode());
         }
         break;
 
       case VK_D:
         toggleShowDynamicKomi();
+        break;
+
+      case VK_OPEN_BRACKET:
+        if (Lizzie.frame.BoardPositionProportion > 0) Lizzie.frame.BoardPositionProportion--;
+        break;
+
+      case VK_CLOSE_BRACKET:
+        if (Lizzie.frame.BoardPositionProportion < 8) Lizzie.frame.BoardPositionProportion++;
         break;
 
         // Use Ctrl+Num to switching multiple engine

@@ -552,7 +552,8 @@ public class BoardRenderer {
    */
   private void drawLeelazSuggestions(Graphics2D g) {
     int minAlpha = 32;
-    float winrateHueFactor = 2.0f;
+    float winrateHueFactor = 0.9f;
+	//float winrateHueFactor = 2.0f; // MY ORIGINAL LINE.
     float alphaFactor = 5.0f;
     float redHue = Color.RGBtoHSB(255, 0, 0, null)[0];
     float greenHue = Color.RGBtoHSB(0, 255, 0, null)[0];
@@ -569,9 +570,11 @@ public class BoardRenderer {
 
       int maxPlayouts = 0;
       double maxWinrate = 0;
+      double minWinrate = 100.0;
       for (MoveData move : bestMoves) {
         if (move.playouts > maxPlayouts) maxPlayouts = move.playouts;
         if (move.winrate > maxWinrate) maxWinrate = move.winrate;
+        if (move.winrate < minWinrate) minWinrate = move.winrate;
       }
 
       for (int i = 0; i < Board.boardSize; i++) {
@@ -604,8 +607,9 @@ public class BoardRenderer {
             continue; // This actually can happen
           }
 
-                    double percentPlayouts = (double) move.playouts / maxPlayouts;
-					double percentWinrate = (double) move.winrate / maxWinrate;
+          float percentPlayouts = (float) move.playouts / maxPlayouts;
+          double percentWinrate = Math.min(1, Math.max(0.01, move.winrate - minWinrate) / Math.max(0.01, maxWinrate - minWinrate));
+          System.out.println(percentWinrate + " -> " + move.winrate + " " + minWinrate + "/" + maxWinrate);
 
           Optional<int[]> coordsOpt = Board.asCoordinates(move.coordinate);
           if (!coordsOpt.isPresent()) {
@@ -622,7 +626,7 @@ public class BoardRenderer {
           } else {
             double fraction;
             if (Lizzie.config.colorByWinrateInsteadOfVisits) {
-              fraction = move.winrate / 100;
+              fraction = percentWinrate;
               if (flipWinrate) {
                 fraction = 1 - fraction;
               }
@@ -645,12 +649,11 @@ public class BoardRenderer {
           float saturation = 1.0f;
 		  //float saturation = 0.75f; // MY OLD PERSONAL SETTING
           float brightness = 0.85f;
-          float alpha =
-              Lizzie.config.colorByWinrateInsteadOfVisits
-                  ? maxAlpha
-                  : minAlpha
+
+          float alpha = minAlpha
                       + (maxAlpha - minAlpha)
-                          * max(0, (float) log(percentPlayouts) / alphaFactor + 1);
+                          * max(0, (float) log(Lizzie.config.colorByWinrateInsteadOfVisits? percentWinrate : percentPlayouts) / alphaFactor + 1);
+                          //* max(0, (float) log(percentPlayouts) / alphaFactor + 1); MY ORIGINAL LINE. REMOVE TWO / SLASHES OFF THESE THREE LINES (AND COMMENT THE ONE LINE RIGHT ABOVE THIS) TO RETURN TO MY PREVIOUS SETTINGS.
           ////float alpha = (minAlpha + (maxAlpha - minAlpha) * max(0, logPlayouts / alphaFactor + 1)); // ORIGINAL OLD LINE. I HAD IT COMMENTED OUT AND USED THE BELOW LINE.
 		  //float alpha = (minAlpha + (maxAlpha - minAlpha) * max(0, logWinrate / alphaFactor + 1)); // MY NEWER VERSION OF THE ABOVE LINE (BUT NOW BOTH ARE OLD).
 
@@ -665,24 +668,25 @@ public class BoardRenderer {
             fillCircle(g, suggestionX, suggestionY, stoneRadius);
           }
 
-          boolean ringedMove = isBestMove || hasMaxWinrate;
+          boolean ringedMove = !Lizzie.config.colorByWinrateInsteadOfVisits && (isBestMove || hasMaxWinrate);
           if (!branchOpt.isPresent() || (ringedMove && isMouseOver)) {
             int strokeWidth = 1;
             if (ringedMove) {
               strokeWidth = 2;
               if (isBestMove) {
                 if (hasMaxWinrate) {
-                  g.setColor(Color.CYAN);
+                  g.setColor(color.darker());
+                  strokeWidth = 1;
                 } else {
-                  g.setColor(Color.MAGENTA);
+                  g.setColor(Color.RED);
                 }
               } else {
                 g.setColor(Color.BLUE);
               }
-              g.setStroke(new BasicStroke(strokeWidth));
             } else {
               g.setColor(color.darker());
             }
+            g.setStroke(new BasicStroke(strokeWidth));
             drawCircle(g, suggestionX, suggestionY, stoneRadius - strokeWidth / 2);
             g.setStroke(new BasicStroke(1));
           }

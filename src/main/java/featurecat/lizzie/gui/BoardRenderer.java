@@ -558,7 +558,7 @@ public class BoardRenderer {
   private void drawLeelazSuggestions(Graphics2D g) {
     int minAlpha = 32;
     float winrateHueFactor = 0.9f;
-    float alphaFactor = 5.0f;
+    float alphaFactor = 3.0f;
     float redHue = Color.RGBtoHSB(255, 0, 0, null)[0];
     float greenHue = Color.RGBtoHSB(0, 255, 0, null)[0];
     float cyanHue = Color.RGBtoHSB(0, 255, 255, null)[0];
@@ -662,7 +662,7 @@ public class BoardRenderer {
 //                        alpha = 255;
 **************************************************/
 
-          float saturation = 1.0f;
+          float saturation = 0.75f;
           float brightness = 0.85f;
           float alpha = minAlpha
                       + (maxAlpha - minAlpha)

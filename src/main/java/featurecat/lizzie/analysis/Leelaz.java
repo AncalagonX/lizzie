@@ -535,6 +535,11 @@ public class Leelaz {
 		sendCommand(command);
 		ponder();
 	}
+	public void reset_search_width() {
+		String command = "reset_search_width";
+		sendCommand(command);
+		ponder();
+	}
 
   /****************************************************************
   ///////////// OLD ORIGINAL CODE FROM MY OLD VERSION:

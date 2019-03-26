@@ -241,20 +241,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         Lizzie.board.pass();
         break;
 
-			case VK_1:
-                Lizzie.leelaz.narrow_search();
-				if (Lizzie.leelaz.isPondering())
-                    Lizzie.leelaz.togglePonder();
-				Lizzie.leelaz.togglePonder();
-                break;
-
-			case VK_2:
-                Lizzie.leelaz.widen_search();
-				if (Lizzie.leelaz.isPondering())
-                    Lizzie.leelaz.togglePonder();
-				Lizzie.leelaz.togglePonder();
-                break;
-
       case VK_COMMA:
         if (!Lizzie.frame.playCurrentVariation()) Lizzie.frame.playBestMove();
         break;
@@ -433,9 +419,30 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
         // Use Ctrl+Num to switching multiple engine
       case VK_0:
-      // case VK_1:
-      // case VK_2:
+      case VK_1:
+	    if (!(controlIsPressed(e))) {
+            Lizzie.leelaz.narrow_search();
+		    if (Lizzie.leelaz.isPondering())
+                Lizzie.leelaz.togglePonder();
+		    Lizzie.leelaz.togglePonder();
+		    break;
+		  }
+      case VK_2:
+	    if (!(controlIsPressed(e))) {
+            Lizzie.leelaz.widen_search();
+		    if (Lizzie.leelaz.isPondering())
+                Lizzie.leelaz.togglePonder();
+		    Lizzie.leelaz.togglePonder();
+            break;
+		  }
       case VK_3:
+	    if (!(controlIsPressed(e))) {
+            Lizzie.leelaz.reset_search_width();
+		    if (Lizzie.leelaz.isPondering())
+                Lizzie.leelaz.togglePonder();
+		    Lizzie.leelaz.togglePonder();
+            break;
+		  }
       case VK_4:
       case VK_5:
       case VK_6:

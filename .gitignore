@@ -35,3 +35,9 @@ lizzie.sh
 lizzie.jar
 *.sh
 *.jar
+/.vs/config/applicationhost.config
+*.suo
+/.vs/lizzie/v15/Browse.VC.db
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/.vs/ProjectSettings.json

@@ -225,9 +225,13 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_N:
-        // stop the ponder
-        if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
-        LizzieFrame.startNewGame();
+        if (controlIsPressed(e)) {
+		  // stop the ponder
+          if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+          LizzieFrame.startNewGame();
+        } else if (e.isShiftDown()) {
+		  Lizzie.leelaz.set_opponent("none");
+		}
         break;
       case VK_SPACE:
         if (Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -325,10 +329,18 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_W:
         if (controlIsPressed(e)) {
           Lizzie.config.toggleLargeWinrate();
-        } else {
+        } else if (e.isShiftDown()) {
+		  Lizzie.leelaz.set_opponent("white");
+		} else {
           Lizzie.config.toggleShowWinrate();
         }
         break;
+	  
+	  case VK_B:
+	    if (e.isShiftDown()) {
+		  Lizzie.leelaz.set_opponent("black");
+		}
+		break;
 
       case VK_G:
         Lizzie.config.toggleShowVariationGraph();
@@ -418,37 +430,121 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
         // Use Ctrl+Num to switching multiple engine
+		// Use Num without CTRL to set search width
+		// Push "1" for default LZ search, which is maximum narrowness.
+		// Push "2" and beyond for increasingly wide search.
+		// Pushing "0" is the maximum width search, temporarily set to roughly search across the best 190 moves on the board.
+	  //shouldDisableAnalysis = false;
+	  case VK_BACK_QUOTE:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("0");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("0");
+			break;
+		}
       case VK_0:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("10");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("10");
+			break;
+		}
       case VK_1:
-	    if (!(controlIsPressed(e))) {
-            Lizzie.leelaz.narrow_search();
-		    if (Lizzie.leelaz.isPondering())
-                Lizzie.leelaz.togglePonder();
-		    Lizzie.leelaz.togglePonder();
-		    break;
-		  }
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("1");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("1");
+			break;
+		}
       case VK_2:
-	    if (!(controlIsPressed(e))) {
-            Lizzie.leelaz.widen_search();
-		    if (Lizzie.leelaz.isPondering())
-                Lizzie.leelaz.togglePonder();
-		    Lizzie.leelaz.togglePonder();
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("2");
             break;
-		  }
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("2");
+			break;
+		}
       case VK_3:
-	    if (!(controlIsPressed(e))) {
-            Lizzie.leelaz.reset_search_width();
-		    if (Lizzie.leelaz.isPondering())
-                Lizzie.leelaz.togglePonder();
-		    Lizzie.leelaz.togglePonder();
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("3");
             break;
-		  }
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("3");
+			break;
+		}
       case VK_4:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("4");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("4");
+			break;
+		}
       case VK_5:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("5");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("5");
+			break;
+		}
       case VK_6:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("6");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("6");
+			break;
+		}
       case VK_7:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("7");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("7");
+			break;
+		}
       case VK_8:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("8");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("8");
+			break;
+		}
       case VK_9:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("9");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("9");
+			break;
+		}
         if (controlIsPressed(e)) {
           Lizzie.switchEngine(e.getKeyCode() - VK_0);
         }

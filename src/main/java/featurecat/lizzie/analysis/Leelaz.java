@@ -553,21 +553,23 @@ public class Leelaz {
 		if (isPondering) ponder();
 	}
 
-  /****************************************************************
-  ///////////// OLD ORIGINAL CODE FROM MY OLD VERSION:
+  public void analyzeAvoid(String type, String color, String coordList, int untilMove) {
+    analyzeAvoid(
+        String.format("%s %s %s %d", type, color, coordList, untilMove <= 0 ? 1 : untilMove));
+  }
 
-
-    public void undo() {
-        synchronized (this) {
-            sendCommand("undo");
-            bestMoves = new ArrayList<>();
-            if (isPondering)
-                ponder();
-        }
+  public void analyzeAvoid(String parameters) {
+    bestMoves = new ArrayList<>();
+    if (!isPondering) {
+      isPondering = true;
+      startPonderTime = System.currentTimeMillis();
     }
-
-	****************************************************************/
-
+    sendCommand(
+        String.format(
+            "lz-analyze %d %s",
+            Lizzie.config.config.getJSONObject("leelaz").getInt("analyze-update-interval-centisec"),
+            parameters));
+  }
 
   /** This initializes leelaz's pondering mode at its current position */
   private void ponder() {

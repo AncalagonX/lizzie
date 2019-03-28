@@ -412,6 +412,9 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 		if (e.isShiftDown()) {
 		    Lizzie.leelaz.set_multidepth_search("0");
 			break;
+		} if (controlIsPressed(e)) {
+		    Lizzie.leelaz.reset_nncache();
+			break;
 		}
       case VK_0:
 	    shouldDisableAnalysis = false;

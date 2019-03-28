@@ -450,40 +450,49 @@ public class Leelaz {
     isPondering = false;
   }
 
-  	public void narrow_search() {
-		String command = "narrow_search";
-		sendCommand(command);
-		ponder();
-	}
+  public void narrow_search() {
+	String command = "narrow_search";
+	sendCommand(command);
+	ponder();
+  }
 
-	public void widen_search() {
-		String command = "widen_search";
-		sendCommand(command);
-		ponder();
-	}
-	public void set_search_width(String desired_search_width) {
-		String command = "set_search_width " + desired_search_width;
-		sendCommand(command);
-		if (isPondering) ponder();
-	}
+  public void widen_search() {
+	String command = "widen_search";
+	sendCommand(command);
+	ponder();
+  }
+  public void set_search_width(String desired_search_width) {
+	String command = "set_search_width " + desired_search_width;
+	sendCommand(command);
+	if (isPondering) ponder();
+  }
 
-	public void set_opponent(String set_opponent_color) {
-		String command = "set_opponent " + set_opponent_color;
-		sendCommand(command);
-		if (isPondering) ponder();
-	}
+  public void set_opponent(String set_opponent_color) {
+	String command = "set_opponent " + set_opponent_color;
+	sendCommand(command);
+	if (isPondering) ponder();
+  }
 
-	public void set_multidepth_search(String desired_multidepth_search) {
-		String command = "set_multidepth_search " + desired_multidepth_search;
-		sendCommand(command);
-		if (isPondering) ponder();
-	}
+  public void set_multidepth_search(String desired_multidepth_search) {
+	String command = "set_multidepth_search " + desired_multidepth_search;
+	sendCommand(command);
+	if (isPondering) ponder();
+  }
+
+  public void reset_nncache() {
+    sendCommand("name"); // ends pondering
+	isPondering = false;
+	String command = "reset_nncache";
+	sendCommand(command);
+  }
 
   public void undo() {
     synchronized (this) {
       sendCommand("undo");
       bestMoves = new ArrayList<>();
-      if (isPondering) ponder();
+      if (isPondering) {
+	    isPondering = false;
+      }
     }
   }
 

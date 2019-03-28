@@ -40,11 +40,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
   @Override
   public void keyTyped(KeyEvent e) {}
 
-  private void undo() {
+  public static void undo() {
     undo(1);
   }
 
-  private void undo(int movesToAdvance) {
+  public static void undo(int movesToAdvance) {
     if (Lizzie.board.inAnalysisMode()) Lizzie.board.toggleAnalysis();
     if (Lizzie.frame.isPlayingAgainstLeelaz) {
       Lizzie.frame.isPlayingAgainstLeelaz = false;
@@ -96,6 +96,14 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
     for (int i = 0; i < movesToAdvance; i++) Lizzie.board.nextMove();
   }
 
+  private void startTemporaryBoard() {
+    if (Lizzie.config.showBestMoves) {
+      startRawBoard();
+    } else {
+      Lizzie.config.showBestMovesTemporarily = true;
+    }
+  }
+
   private void startRawBoard() {
     if (!Lizzie.config.showRawBoard) {
       Lizzie.frame.startRawBoard();
@@ -106,6 +114,11 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
   private void stopRawBoard() {
     Lizzie.frame.stopRawBoard();
     Lizzie.config.showRawBoard = false;
+  }
+
+  private void stopTemporaryBoard() {
+    stopRawBoard();
+    Lizzie.config.showBestMovesTemporarily = false;
   }
 
   private void toggleHints() {
@@ -160,6 +173,9 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
     boolean shouldDisableAnalysis = true;
 
     switch (e.getKeyCode()) {
+      case VK_E:
+        Lizzie.frame.toggleGtpConsole();
+        break;
       case VK_RIGHT:
         if (e.isShiftDown()) {
           moveBranchDown();
@@ -209,9 +225,13 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_N:
-        // stop the ponder
-        if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
-        LizzieFrame.startNewGame();
+        if (controlIsPressed(e)) {
+		  // stop the ponder
+          if (Lizzie.leelaz.isPondering()) Lizzie.leelaz.togglePonder();
+          LizzieFrame.startNewGame();
+        } else if (e.isShiftDown()) {
+		  Lizzie.leelaz.set_opponent("none");
+		}
         break;
       case VK_SPACE:
         if (Lizzie.frame.isPlayingAgainstLeelaz) {
@@ -225,26 +245,16 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         Lizzie.board.pass();
         break;
 
-      case VK_1:
-        Lizzie.leelaz.narrow_search();
-        if (Lizzie.leelaz.isPondering())
-          Lizzie.leelaz.togglePonder();
-        Lizzie.leelaz.togglePonder();
-        break;
-
-	  case VK_2:
-        Lizzie.leelaz.widen_search();
-        if (Lizzie.leelaz.isPondering())
-          Lizzie.leelaz.togglePonder();
-        Lizzie.leelaz.togglePonder();
-        break;
-	  
-	  case VK_COMMA:
+      case VK_COMMA:
         if (!Lizzie.frame.playCurrentVariation()) Lizzie.frame.playBestMove();
         break;
 
       case VK_M:
-        Lizzie.config.toggleShowMoveNumber();
+        if (e.isAltDown()) {
+          Lizzie.frame.openChangeMoveDialog();
+        } else {
+          Lizzie.config.toggleShowMoveNumber();
+        }
         break;
 
       case VK_F:
@@ -300,25 +310,37 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_X:
-        if (!Lizzie.frame.showControls) {
-          if (Lizzie.leelaz.isPondering()) {
-            wasPonderingWhenControlsShown = true;
-            Lizzie.leelaz.togglePonder();
-          } else {
-            wasPonderingWhenControlsShown = false;
+        if (controlIsPressed(e)) {
+          Lizzie.frame.openConfigDialog();
+        } else {
+          if (!Lizzie.frame.showControls) {
+            if (Lizzie.leelaz.isPondering()) {
+              wasPonderingWhenControlsShown = true;
+              Lizzie.leelaz.togglePonder();
+            } else {
+              wasPonderingWhenControlsShown = false;
+            }
+            Lizzie.frame.drawControls();
           }
-          Lizzie.frame.drawControls();
+          Lizzie.frame.showControls = true;
         }
-        Lizzie.frame.showControls = true;
         break;
 
       case VK_W:
         if (controlIsPressed(e)) {
           Lizzie.config.toggleLargeWinrate();
-        } else {
+        } else if (e.isShiftDown()) {
+		  Lizzie.leelaz.set_opponent("white");
+		} else {
           Lizzie.config.toggleShowWinrate();
         }
         break;
+	  
+	  case VK_B:
+	    if (e.isShiftDown()) {
+		  Lizzie.leelaz.set_opponent("black");
+		}
+		break;
 
       case VK_G:
         Lizzie.config.toggleShowVariationGraph();
@@ -372,13 +394,17 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         if (e.isShiftDown()) {
           toggleHints();
         } else {
-          startRawBoard();
+          startTemporaryBoard();
         }
         break;
 
       case VK_A:
-        shouldDisableAnalysis = false;
-        Lizzie.board.toggleAnalysis();
+        if (e.isAltDown()) {
+          Lizzie.frame.openAvoidMoveDialog();
+        } else {
+          shouldDisableAnalysis = false;
+          Lizzie.board.toggleAnalysis();
+        }
         break;
 
       case VK_PERIOD:
@@ -391,6 +417,10 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         toggleShowDynamicKomi();
         break;
 
+      case VK_R:
+        Lizzie.frame.replayBranch();
+        break;
+
       case VK_OPEN_BRACKET:
         if (Lizzie.frame.BoardPositionProportion > 0) Lizzie.frame.BoardPositionProportion--;
         break;
@@ -399,17 +429,126 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         if (Lizzie.frame.BoardPositionProportion < 8) Lizzie.frame.BoardPositionProportion++;
         break;
 
+      case VK_K:
+        Lizzie.config.toggleEvaluationColoring();
+        break;
+
         // Use Ctrl+Num to switching multiple engine
+		// Use Num without CTRL to set search width
+		// Push "1" for default LZ search, which is maximum narrowness.
+		// Push "2" and beyond for increasingly wide search.
+		// Pushing "0" is the maximum width search, temporarily set to roughly search across the best 190 moves on the board.
+	  //shouldDisableAnalysis = false;
+	  case VK_BACK_QUOTE:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("0");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("0");
+			break;
+		}
       case VK_0:
-      // case VK_1:
-      // case VK_2:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("10");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("10");
+			break;
+		}
+      case VK_1:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("1");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("1");
+			break;
+		}
+      case VK_2:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("2");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("2");
+			break;
+		}
       case VK_3:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("3");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("3");
+			break;
+		}
       case VK_4:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("4");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("4");
+			break;
+		}
       case VK_5:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("5");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("5");
+			break;
+		}
       case VK_6:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("6");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("6");
+			break;
+		}
       case VK_7:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("7");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("7");
+			break;
+		}
       case VK_8:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("8");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("8");
+			break;
+		}
       case VK_9:
+	    shouldDisableAnalysis = false;
+	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
+            Lizzie.leelaz.set_search_width("9");
+            break;
+		}
+		if (e.isShiftDown()) {
+		    Lizzie.leelaz.set_multidepth_search("9");
+			break;
+		}
         if (controlIsPressed(e)) {
           Lizzie.switchEngine(e.getKeyCode() - VK_0);
         }
@@ -435,7 +574,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         break;
 
       case VK_Z:
-        stopRawBoard();
+        stopTemporaryBoard();
         Lizzie.frame.repaint();
         break;
 

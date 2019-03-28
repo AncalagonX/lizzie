@@ -4,14 +4,13 @@ import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.rules.Stone;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,6 +43,7 @@ public class Leelaz {
   private BufferedOutputStream outputStream;
 
   private boolean printCommunication;
+  public boolean gtpConsole;
 
   private List<MoveData> bestMoves;
   private List<MoveData> bestMovesTemp;
@@ -58,6 +58,7 @@ public class Leelaz {
 
   // genmove
   public boolean isThinking = false;
+  public boolean isInputCommand = false;
 
   private boolean isLoaded = false;
   private boolean isCheckingVersion;
@@ -66,8 +67,8 @@ public class Leelaz {
   private String engineCommand;
   private List<String> commands;
   private JSONObject config;
-  private String currentWeightFile;
-  private String currentWeight;
+  private String currentWeightFile = "";
+  private String currentWeight = "";
   private boolean switching = false;
   private int currentEngineN = -1;
   private ScheduledExecutorService executor;
@@ -75,6 +76,7 @@ public class Leelaz {
   // dynamic komi and opponent komi as reported by dynamic-komi version of leelaz
   private float dynamicKomi = Float.NaN;
   private float dynamicOppKomi = Float.NaN;
+
   /**
    * Initializes the leelaz process and starts reading output
    *
@@ -95,6 +97,7 @@ public class Leelaz {
     config = Lizzie.config.config.getJSONObject("leelaz");
 
     printCommunication = config.getBoolean("print-comms");
+    gtpConsole = printCommunication;
     maxAnalyzeTimeMillis = MINUTE * config.getInt("max-analyze-time-minutes");
 
     // command string for starting the engine
@@ -113,11 +116,10 @@ public class Leelaz {
       return;
     }
 
-    // Create this as a list which gets passed into the processbuilder
-    commands = Arrays.asList(engineCommand.split(" "));
+    commands = splitCommand(engineCommand);
 
     // Get weight name
-    Pattern wPattern = Pattern.compile("(?s).*?(--weights |-w )([^ ]+)(?s).*");
+    Pattern wPattern = Pattern.compile("(?s).*?(--weights |-w )([^'\" ]+)(?s).*");
     Matcher wMatcher = wPattern.matcher(engineCommand);
     if (wMatcher.matches() && wMatcher.groupCount() == 2) {
       currentWeightFile = wMatcher.group(2);
@@ -126,29 +128,31 @@ public class Leelaz {
     }
 
     // Check if engine is present
-    File startfolder = new File(config.optString("engine-start-location", "."));
-    File lef = startfolder.toPath().resolve(new File(commands.get(0)).toPath()).toFile();
-    System.out.println(lef.getPath());
-    if (!lef.exists()) {
-      JOptionPane.showMessageDialog(
-          null,
-          resourceBundle.getString("LizzieFrame.display.leelaz-missing"),
-          "Lizzie - Error!",
-          JOptionPane.ERROR_MESSAGE);
-      throw new IOException("engine not present");
-    }
+    // Commented for remote ssh. TODO keep or remove this code?
+    //    File startfolder = new File(config.optString("engine-start-location", "."));
+    //    File lef = startfolder.toPath().resolve(new File(commands.get(0)).toPath()).toFile();
+    //    System.out.println(lef.getPath());
+    //    if (!lef.exists()) {
+    //      JOptionPane.showMessageDialog(
+    //          null,
+    //          resourceBundle.getString("LizzieFrame.display.leelaz-missing"),
+    //          "Lizzie - Error!",
+    //          JOptionPane.ERROR_MESSAGE);
+    //      throw new IOException("engine not present");
+    //    }
 
     // Check if network file is present
-    File wf = startfolder.toPath().resolve(new File(currentWeightFile).toPath()).toFile();
-    if (!wf.exists()) {
-      JOptionPane.showMessageDialog(
-          null, resourceBundle.getString("LizzieFrame.display.network-missing"));
-      throw new IOException("network-file not present");
-    }
+    //    File wf = startfolder.toPath().resolve(new File(currentWeightFile).toPath()).toFile();
+    //    if (!wf.exists()) {
+    //      JOptionPane.showMessageDialog(
+    //          null, resourceBundle.getString("LizzieFrame.display.network-missing"));
+    //      throw new IOException("network-file not present");
+    //    }
 
     // run leelaz
     ProcessBuilder processBuilder = new ProcessBuilder(commands);
-    processBuilder.directory(startfolder); // todo enable
+    // Commented for remote ssh
+    //    processBuilder.directory(startfolder);
     processBuilder.redirectErrorStream(true);
     process = processBuilder.start();
 
@@ -158,6 +162,7 @@ public class Leelaz {
     // Response handled in parseLine
     isCheckingVersion = true;
     sendCommand("version");
+    sendCommand("boardsize " + Lizzie.config.uiConfig.optInt("board-size", 19));
 
     // start a thread to continuously read Leelaz output
     // new Thread(this::read).start();
@@ -204,12 +209,15 @@ public class Leelaz {
     outputStream = new BufferedOutputStream(process.getOutputStream());
   }
 
-  private void parseInfo(String line) {
-    bestMoves = new ArrayList<>();
+  public static List<MoveData> parseInfo(String line) {
+    List<MoveData> bestMoves = new ArrayList<>();
     String[] variations = line.split(" info ");
     for (String var : variations) {
-      bestMoves.add(MoveData.fromInfo(var));
+      if (!var.trim().isEmpty()){
+        bestMoves.add(MoveData.fromInfo(var));
+      }
     }
+    return bestMoves;
   }
 
   /**
@@ -219,6 +227,9 @@ public class Leelaz {
    */
   private void parseLine(String line) {
     synchronized (this) {
+      if (printCommunication || gtpConsole) {
+        Lizzie.gtpConsole.addLine(line);
+      }
       if (line.startsWith("komi=")) {
         try {
           dynamicKomi = Float.parseFloat(line.substring("komi=".length()).trim());
@@ -241,7 +252,7 @@ public class Leelaz {
         Lizzie.frame.updateTitle();
         if (isResponseUpToDate()) {
           // This should not be stale data when the command number match
-          parseInfo(line.substring(5));
+          this.bestMoves = parseInfo(line.substring(5));
           notifyBestMoveListeners();
           Lizzie.frame.repaint();
           // don't follow the maxAnalyzeTime rule if we are in analysis mode
@@ -253,7 +264,8 @@ public class Leelaz {
       } else if (line.contains(" -> ")) {
         isLoaded = true;
         if (isResponseUpToDate()
-            || isThinking && !isPondering && Lizzie.frame.isPlayingAgainstLeelaz) {
+            || isThinking
+                && (!isPondering && Lizzie.frame.isPlayingAgainstLeelaz || isInputCommand)) {
           bestMoves.add(MoveData.fromSummary(line));
           notifyBestMoveListeners();
           Lizzie.frame.repaint();
@@ -266,8 +278,9 @@ public class Leelaz {
         isThinking = false;
 
       } else if (line.startsWith("=") || line.startsWith("?")) {
-        if (printCommunication) {
+        if (printCommunication || gtpConsole) {
           System.out.print(line);
+          Lizzie.gtpConsole.addLine(line);
         }
         String[] params = line.trim().split(" ");
         currentCmdNum = Integer.parseInt(params[0].substring(1).trim());
@@ -285,11 +298,16 @@ public class Leelaz {
           }
           isSettingHandicap = false;
         } else if (isThinking && !isPondering) {
-          if (Lizzie.frame.isPlayingAgainstLeelaz) {
+          if (Lizzie.frame.isPlayingAgainstLeelaz || isInputCommand) {
             Lizzie.board.place(params[1]);
             togglePonder();
-            isPondering = false;
+            if (!isInputCommand) {
+              isPondering = false;
+            }
             isThinking = false;
+            if (isInputCommand) {
+              isInputCommand = false;
+            }
           }
         } else if (isCheckingVersion) {
           String[] ver = params[1].split("\\.");
@@ -393,11 +411,12 @@ public class Leelaz {
    */
   private void sendCommandToLeelaz(String command) {
     if (command.startsWith("fixed_handicap")) isSettingHandicap = true;
+    if (printCommunication) {
+      System.out.printf("> %d %s\n", cmdNumber, command);
+    }
+    Lizzie.gtpConsole.addCommand(command, cmdNumber);
     command = cmdNumber + " " + command;
     cmdNumber++;
-    if (printCommunication) {
-      System.out.printf("> %s\n", command);
-    }
     try {
       outputStream.write((command + "\n").getBytes());
       outputStream.flush();
@@ -450,17 +469,34 @@ public class Leelaz {
     isPondering = false;
   }
 
-  	public void narrow_search() {
-		String command = "narrow_search";
-		sendCommand(command);
-		ponder();
-	}
+  public void genmove_analyze(String color) {
+    String command =
+        "lz-genmove_analyze "
+            + color
+            + " "
+            + Lizzie.config
+                .config
+                .getJSONObject("leelaz")
+                .getInt("analyze-update-interval-centisec");
+    sendCommand(command);
+    isThinking = true;
+    isPondering = false;
+  }
 
-	public void widen_search() {
-		String command = "widen_search";
-		sendCommand(command);
-		ponder();
-	}
+  public void time_settings() {
+    Lizzie.leelaz.sendCommand(
+        "time_settings 0 "
+            + Lizzie.config.config.getJSONObject("leelaz").getInt("max-game-thinking-time-seconds")
+            + " 1");
+  }
+
+  public void clear() {
+    synchronized (this) {
+      sendCommand("clear_board");
+      bestMoves = new ArrayList<>();
+      if (isPondering) ponder();
+    }
+  }
 
   public void undo() {
     synchronized (this) {
@@ -468,6 +504,71 @@ public class Leelaz {
       bestMoves = new ArrayList<>();
       if (isPondering) ponder();
     }
+  }
+
+  /****************************************************************
+  ///////////// OLD ORIGINAL CODE FROM MY OLD VERSION:
+
+    public void genmove(String color) {
+        String command = "genmove " + color;
+        //
+        // We don't support displaying this while playing, so no reason to request it (for now)
+        //if (isPondering) {
+        //    command = "lz-genmove_analyze " + color + " 10";
+        //}
+        sendCommand(command);
+        isThinking = true;
+        isPondering = false;
+    }
+
+	****************************************************************/
+
+	
+	public void narrow_search() {
+		String command = "narrow_search";
+		sendCommand(command);
+		if (isPondering) ponder();
+	}
+
+	public void widen_search() {
+		String command = "widen_search";
+		sendCommand(command);
+		if (isPondering) ponder();
+	}
+	public void set_search_width(String desired_search_width) {
+		String command = "set_search_width " + desired_search_width;
+		sendCommand(command);
+		if (isPondering) ponder();
+	}
+
+	public void set_opponent(String set_opponent_color) {
+		String command = "set_opponent " + set_opponent_color;
+		sendCommand(command);
+		if (isPondering) ponder();
+	}
+
+	public void set_multidepth_search(String desired_multidepth_search) {
+		String command = "set_multidepth_search " + desired_multidepth_search;
+		sendCommand(command);
+		if (isPondering) ponder();
+	}
+
+  public void analyzeAvoid(String type, String color, String coordList, int untilMove) {
+    analyzeAvoid(
+        String.format("%s %s %s %d", type, color, coordList, untilMove <= 0 ? 1 : untilMove));
+  }
+
+  public void analyzeAvoid(String parameters) {
+    bestMoves = new ArrayList<>();
+    if (!isPondering) {
+      isPondering = true;
+      startPonderTime = System.currentTimeMillis();
+    }
+    sendCommand(
+        String.format(
+            "lz-analyze %d %s",
+            Lizzie.config.config.getJSONObject("leelaz").getInt("analyze-update-interval-centisec"),
+            parameters));
   }
 
   /** This initializes leelaz's pondering mode at its current position */
@@ -621,11 +722,77 @@ public class Leelaz {
     }
   }
 
+  private static enum ParamState {
+    NORMAL,
+    QUOTE,
+    DOUBLE_QUOTE
+  }
+
+  public List<String> splitCommand(String commandLine) {
+    if (commandLine == null || commandLine.length() == 0) {
+      return new ArrayList<String>();
+    }
+
+    final ArrayList<String> commandList = new ArrayList<String>();
+    final StringBuilder param = new StringBuilder();
+    final StringTokenizer tokens = new StringTokenizer(commandLine, " '\"", true);
+    boolean lastTokenQuoted = false;
+    ParamState state = ParamState.NORMAL;
+
+    while (tokens.hasMoreTokens()) {
+      String nextToken = tokens.nextToken();
+      switch (state) {
+        case QUOTE:
+          if ("'".equals(nextToken)) {
+            state = ParamState.NORMAL;
+            lastTokenQuoted = true;
+          } else {
+            param.append(nextToken);
+          }
+          break;
+        case DOUBLE_QUOTE:
+          if ("\"".equals(nextToken)) {
+            state = ParamState.NORMAL;
+            lastTokenQuoted = true;
+          } else {
+            param.append(nextToken);
+          }
+          break;
+        default:
+          if ("'".equals(nextToken)) {
+            state = ParamState.QUOTE;
+          } else if ("\"".equals(nextToken)) {
+            state = ParamState.DOUBLE_QUOTE;
+          } else if (" ".equals(nextToken)) {
+            if (lastTokenQuoted || param.length() != 0) {
+              commandList.add(param.toString());
+              param.delete(0, param.length());
+            }
+          } else {
+            param.append(nextToken);
+          }
+          lastTokenQuoted = false;
+          break;
+      }
+    }
+    if (lastTokenQuoted || param.length() != 0) {
+      commandList.add(param.toString());
+    }
+    return commandList;
+  }
+
   public boolean isLoaded() {
     return isLoaded;
   }
 
   public String currentWeight() {
+    return currentWeight;
+  }
+
+  public String currentShortWeight() {
+    if (currentWeight != null && currentWeight.length() > 18) {
+      return currentWeight.substring(0, 16) + "..";
+    }
     return currentWeight;
   }
 
@@ -639,5 +806,9 @@ public class Leelaz {
 
   public String engineCommand() {
     return this.engineCommand;
+  }
+
+  public void toggleGtpConsole() {
+    gtpConsole = !gtpConsole;
   }
 }

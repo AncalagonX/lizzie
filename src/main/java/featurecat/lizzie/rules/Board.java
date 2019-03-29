@@ -1231,6 +1231,8 @@ public class Board implements LeelazListener {
   }
 
   public void bestMoveNotification(List<MoveData> bestMoves) {
+    int bestPlayoutsSeenAnalysis = 0;
+	double bestWinrateSeenAnalysis = 0.0;
     if (analysisMode) {
       boolean isSuccessivePass =
           (history.getPrevious().isPresent()
@@ -1247,9 +1249,11 @@ public class Board implements LeelazListener {
         // sum the playouts to proceed like leelaz's --visits option.
         int sum = 0;
         for (MoveData move : bestMoves) {
+		  if (move.playouts > bestPlayoutsSeenAnalysis) bestWinrateSeenAnalysis = move.winrate;
+		  if (move.playouts > bestPlayoutsSeenAnalysis) bestPlayoutsSeenAnalysis = move.playouts;
           sum += move.playouts;
         }
-        if (sum >= playoutsAnalysis) {
+		if ((sum - (0.2 * bestPlayoutsSeenAnalysis)) >= playoutsAnalysis) {
           nextMove();
         }
       }

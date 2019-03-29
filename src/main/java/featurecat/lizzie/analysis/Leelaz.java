@@ -480,8 +480,9 @@ public class Leelaz {
   }
 
   public void reset_nncache() {
-    sendCommand("name"); // ends pondering
-	isPondering = false;
+    if (Lizzie.leelaz.isPondering()) {
+      Lizzie.leelaz.togglePonder();
+    }
 	String command = "reset_nncache";
 	sendCommand(command);
   }
@@ -490,9 +491,7 @@ public class Leelaz {
     synchronized (this) {
       sendCommand("undo");
       bestMoves = new ArrayList<>();
-      if (isPondering) {
-	    isPondering = false;
-      }
+      if (isPondering) ponder();
     }
   }
 

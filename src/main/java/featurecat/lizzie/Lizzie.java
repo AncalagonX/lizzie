@@ -79,6 +79,8 @@ public class Lizzie {
    * @param index engine index
    */
   public static void switchEngine(int index) {
+    Lizzie.leelaz.search_width_display = "DEFAULT LZ";
+	Lizzie.leelaz.opponent_display = "WHITE AND BLACK";
     String commandLine;
     if (index == 0) {
       String networkFile = Lizzie.config.leelazConfig.getString("network-file");

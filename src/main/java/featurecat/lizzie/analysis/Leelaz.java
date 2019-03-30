@@ -73,7 +73,7 @@ public class Leelaz {
   private ScheduledExecutorService executor;
 
   // For display output
-  public String search_width_display = "0";
+  public String search_width_display = "DEFAULT LZ";
   public String opponent_display = "BOTH";
 
   // dynamic komi and opponent komi as reported by dynamic-komi version of leelaz
@@ -89,7 +89,7 @@ public class Leelaz {
     bestMovesTemp = new ArrayList<>();
     listeners = new CopyOnWriteArrayList<>();
 
-	search_width_display = "0";
+	search_width_display = "DEFAULT LZ";
 	opponent_display = "WHITE AND BLACK";
 
     isPondering = false;

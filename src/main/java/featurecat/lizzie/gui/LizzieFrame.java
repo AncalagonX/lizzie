@@ -53,7 +53,22 @@ public class LizzieFrame extends JFrame {
       ResourceBundle.getBundle("l10n.DisplayStrings");
 
   private static final String[] commands = {
-    resourceBundle.getString("LizzieFrame.commands.keyN"),
+	
+	resourceBundle.getString("LizzieFrame.commands.keyGrave"),
+	resourceBundle.getString("LizzieFrame.commands.keyNumbers"),
+	resourceBundle.getString("LizzieFrame.commands.keyShiftB"),
+	resourceBundle.getString("LizzieFrame.commands.keyShiftW"),
+	resourceBundle.getString("LizzieFrame.commands.keyShiftN"),
+	resourceBundle.getString("LizzieFrame.commands.keyBlankSpace"),
+
+	resourceBundle.getString("LizzieFrame.commands.keyShiftNumbers"),
+	resourceBundle.getString("LizzieFrame.commands.keyShiftGrave"),
+	resourceBundle.getString("LizzieFrame.commands.keyBlankSpace"),
+
+	resourceBundle.getString("LizzieFrame.commands.keyCtrlGrave"),
+	resourceBundle.getString("LizzieFrame.commands.keyBlankSpace"),
+
+    resourceBundle.getString("LizzieFrame.commands.keyCtrlN"),
     resourceBundle.getString("LizzieFrame.commands.keyEnter"),
     resourceBundle.getString("LizzieFrame.commands.keySpace"),
     resourceBundle.getString("LizzieFrame.commands.keyUpArrow"),

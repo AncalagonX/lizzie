@@ -410,7 +410,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("0");
-			Lizzie.leelaz.search_width_display = "0";
+			Lizzie.leelaz.search_width_display = "DEFAULT LZ";
             break;
 		}
 		if (e.isShiftDown()) {

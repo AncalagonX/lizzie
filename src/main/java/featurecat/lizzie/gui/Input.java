@@ -215,6 +215,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
           LizzieFrame.startNewGame();
         } else if (e.isShiftDown()) {
 		  Lizzie.leelaz.set_opponent("none");
+		  Lizzie.leelaz.opponent_display = "WHITE AND BLACK";
 		}
         break;
       case VK_SPACE:
@@ -306,7 +307,8 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         if (controlIsPressed(e)) {
           Lizzie.config.toggleLargeWinrate();
         } else if (e.isShiftDown()) {
-		  Lizzie.leelaz.set_opponent("white");
+		  Lizzie.leelaz.set_opponent("black");
+		  Lizzie.leelaz.opponent_display = "WHITE ONLY";
 		} else {
           Lizzie.config.toggleShowWinrate();
         }
@@ -314,7 +316,8 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	  
 	  case VK_B:
 	    if (e.isShiftDown()) {
-		  Lizzie.leelaz.set_opponent("black");
+		  Lizzie.leelaz.set_opponent("white");
+		  Lizzie.leelaz.opponent_display = "BLACK ONLY";
 		}
 		break;
 
@@ -407,6 +410,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("0");
+			Lizzie.leelaz.search_width_display = "0";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -420,6 +424,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("10");
+			Lizzie.leelaz.search_width_display = "10";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -430,6 +435,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("1");
+			Lizzie.leelaz.search_width_display = "1";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -440,6 +446,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("2");
+			Lizzie.leelaz.search_width_display = "2";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -450,6 +457,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("3");
+			Lizzie.leelaz.search_width_display = "3";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -460,6 +468,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("4");
+			Lizzie.leelaz.search_width_display = "4";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -470,6 +479,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("5");
+			Lizzie.leelaz.search_width_display = "5";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -480,6 +490,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("6");
+			Lizzie.leelaz.search_width_display = "6";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -490,6 +501,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("7");
+			Lizzie.leelaz.search_width_display = "7";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -500,6 +512,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("8");
+			Lizzie.leelaz.search_width_display = "8";
             break;
 		}
 		if (e.isShiftDown()) {
@@ -510,6 +523,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 	    shouldDisableAnalysis = false;
 	    if (!(controlIsPressed(e)) && !(e.isShiftDown())) {
             Lizzie.leelaz.set_search_width("9");
+			Lizzie.leelaz.search_width_display = "9";
             break;
 		}
 		if (e.isShiftDown()) {

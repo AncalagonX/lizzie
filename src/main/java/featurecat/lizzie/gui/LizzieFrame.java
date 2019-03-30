@@ -1297,8 +1297,17 @@ public class LizzieFrame extends JFrame {
     updateTitle();
   }
 
+  //public void setPlayers(String whitePlayer, String blackPlayer) {
+  //  String search_width_display = Lizzie.leelaz.search_width_display;
+  //  String opponent_display = Lizzie.leelaz.opponent_display;
+  //  playerTitle = String.format(" [SEARCH_WIDTH = %s] - [WIDE_SEARCH_FOR = %s] - (%s [W] vs %s [B])", search_width_display, opponent_display, whitePlayer, blackPlayer);
+  //  updateTitle();
+  //}
+
   public void updateTitle() {
+    String searchDisplayTitle = String.format(" [SEARCH_WIDTH = %s] - [WIDE_SEARCH_FOR = %s] - ", Lizzie.leelaz.search_width_display, Lizzie.leelaz.opponent_display);
     StringBuilder sb = new StringBuilder(DEFAULT_TITLE);
+	sb.append(searchDisplayTitle);
     sb.append(playerTitle);
     sb.append(" [" + Lizzie.leelaz.engineCommand() + "]");
     setTitle(sb.toString());

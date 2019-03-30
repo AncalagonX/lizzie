@@ -72,6 +72,10 @@ public class Leelaz {
   private int currentEngineN = -1;
   private ScheduledExecutorService executor;
 
+  // For display output
+  public String search_width_display = "0";
+  public String opponent_display = "BOTH";
+
   // dynamic komi and opponent komi as reported by dynamic-komi version of leelaz
   private float dynamicKomi = Float.NaN;
   private float dynamicOppKomi = Float.NaN;
@@ -84,6 +88,9 @@ public class Leelaz {
     bestMoves = new ArrayList<>();
     bestMovesTemp = new ArrayList<>();
     listeners = new CopyOnWriteArrayList<>();
+
+	search_width_display = "0";
+	opponent_display = "WHITE AND BLACK";
 
     isPondering = false;
     startPonderTime = System.currentTimeMillis();

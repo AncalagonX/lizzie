@@ -89,8 +89,8 @@ public class Leelaz {
     bestMovesTemp = new ArrayList<>();
     listeners = new CopyOnWriteArrayList<>();
 
-	search_width_display = "DEFAULT LZ";
-	opponent_display = "WHITE AND BLACK";
+    search_width_display = "DEFAULT LZ";
+    opponent_display = "WHITE AND BLACK";
 
     isPondering = false;
     startPonderTime = System.currentTimeMillis();
@@ -458,40 +458,57 @@ public class Leelaz {
   }
 
   public void narrow_search() {
-	String command = "narrow_search";
-	sendCommand(command);
-	ponder();
+    String command = "narrow_search";
+    sendCommand(command);
+    ponder();
   }
 
   public void widen_search() {
-	String command = "widen_search";
-	sendCommand(command);
-	ponder();
+    String command = "widen_search";
+    sendCommand(command);
+    ponder();
   }
   public void set_search_width(String desired_search_width) {
-	String command = "set_search_width " + desired_search_width;
-	sendCommand(command);
-	if (isPondering) ponder();
+    String command = "set_search_width " + desired_search_width;
+    sendCommand(command);
+    if (isPondering) ponder();
+  }
+
+  public void set_komi_05() {
+    String command = "komi 0.5";
+    sendCommand(command);
+    if (isPondering) ponder();
+  }
+
+  public void set_komi_65() {
+    String command = "komi 6.5";
+    sendCommand(command);
+    if (isPondering) ponder();
+  }
+  public void set_komi_75() {
+    String command = "komi 7.5";
+    sendCommand(command);
+    if (isPondering) ponder();
   }
 
   public void set_opponent(String set_opponent_color) {
-	String command = "set_opponent " + set_opponent_color;
-	sendCommand(command);
-	if (isPondering) ponder();
+    String command = "set_opponent " + set_opponent_color;
+    sendCommand(command);
+    if (isPondering) ponder();
   }
 
   public void set_multidepth_search(String desired_multidepth_search) {
-	String command = "set_multidepth_search " + desired_multidepth_search;
-	sendCommand(command);
-	if (isPondering) ponder();
+    String command = "set_multidepth_search " + desired_multidepth_search;
+    sendCommand(command);
+    if (isPondering) ponder();
   }
 
   public void reset_nncache() {
     if (Lizzie.leelaz.isPondering()) {
       Lizzie.leelaz.togglePonder();
     }
-	String command = "reset_nncache";
-	sendCommand(command);
+    String command = "reset_nncache";
+    sendCommand(command);
   }
 
   public void undo() {
@@ -550,14 +567,14 @@ public class Leelaz {
   public class WinrateStats {
     public double maxWinrate;
     public int totalPlayouts;
-	public double bestWinrateSeen;
-	public int bestPlayoutsSeen;
+    public double bestWinrateSeen;
+    public int bestPlayoutsSeen;
 
     public WinrateStats(double maxWinrate, int totalPlayouts) {
       this.maxWinrate = maxWinrate;
       this.totalPlayouts = totalPlayouts;
-	  this.bestWinrateSeen = bestWinrateSeen;
-	  this.bestPlayoutsSeen = bestPlayoutsSeen;
+      this.bestWinrateSeen = bestWinrateSeen;
+      this.bestPlayoutsSeen = bestPlayoutsSeen;
     }
   }
 
@@ -567,8 +584,8 @@ public class Leelaz {
    */
   public WinrateStats getWinrateStats() {
     WinrateStats stats = new WinrateStats(-100, 0);
-	int bestPlayoutsSeen = 0;
-	double bestWinrateSeen = 0.0;
+    int bestPlayoutsSeen = 0;
+    double bestWinrateSeen = 0.0;
 
     if (!bestMoves.isEmpty()) {
       // we should match the Leelaz UCTNode get_eval, which is a weighted average
@@ -581,13 +598,13 @@ public class Leelaz {
       stats.totalPlayouts = totalPlayouts;
 
       // set maxWinrate to the weighted average winrate of moves
-	  for (MoveData move : bestMoves) {
+      for (MoveData move : bestMoves) {
         //if (move.winrate > bestWinrate) bestWinrate = move.winrate;
-		if (move.playouts > bestPlayoutsSeen) bestWinrateSeen = move.winrate;
-		if (move.playouts > bestPlayoutsSeen) bestPlayoutsSeen = move.playouts;
+        if (move.playouts > bestPlayoutsSeen) bestWinrateSeen = move.winrate;
+        if (move.playouts > bestPlayoutsSeen) bestPlayoutsSeen = move.playouts;
       }
       stats.maxWinrate =
-	      bestWinrateSeen;
+          bestWinrateSeen;
           //moves.stream().mapToDouble(move -> move.winrate * move.playouts / totalPlayouts).sum();
     }
 

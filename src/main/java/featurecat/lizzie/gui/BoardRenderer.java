@@ -584,7 +584,7 @@ public class BoardRenderer {
           }
 
                     double percentPlayouts = (double) move.playouts / maxPlayouts;
-					double percentWinrate = (double) move.winrate / maxWinrate;
+                    double percentWinrate = (double) move.winrate / maxWinrate;
 
           Optional<int[]> coordsOpt = Board.asCoordinates(move.coordinate);
           if (!coordsOpt.isPresent()) {
@@ -597,14 +597,14 @@ public class BoardRenderer {
 
           // 0 = Reddest hue
           //float logPlayouts = (float) log(percentPlayouts);
-		  float logWinrate = (float) log(percentWinrate);
+          float logWinrate = (float) log(percentWinrate);
           //float otherHue = -greenHue * max(0, logPlayouts / hueFactor + 1);
-		  float otherHue = -greenHue * max(0, logWinrate / hueFactor + 1);
+          float otherHue = -greenHue * max(0, logWinrate / hueFactor + 1);
           float hue = isBestMove ? cyanHue : otherHue;
           float saturation = 0.75f;
           float brightness = 0.85f;
           //float alpha = (minAlpha + (maxAlpha - minAlpha) * max(0, logPlayouts / alphaFactor + 1));
-		  float alpha = (minAlpha + (maxAlpha - minAlpha) * max(0, logWinrate / alphaFactor + 1));
+          float alpha = (minAlpha + (maxAlpha - minAlpha) * max(0, logWinrate / alphaFactor + 1));
 
           Color hsbColor = Color.getHSBColor(hue, saturation, brightness);
           Color color =
